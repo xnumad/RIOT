@@ -704,9 +704,9 @@ static inline void _nib_dc_remove(_nib_offl_entry_t *nib_offl)
  *                          Must not be NULL or unspecified address. Use
  *                          @ref _nib_drl_add() for default route destinations.
  * @param[in] pfx_len       The length in bits of @p pfx in bits.
- * @param[in] valid_ltime   Valid lifetime in microseconds. `UINT32_MAX` for
+ * @param[in] valid_ltime   Valid lifetime in milliseconds. `UINT32_MAX` for
  *                          infinite.
- * @param[in] pref_ltime    Preferred lifetime in microseconds. `UINT32_MAX` for
+ * @param[in] pref_ltime    Preferred lifetime in milliseconds. `UINT32_MAX` for
  *                          infinite.
  *
  * @return  A new or existing off-link entry with _nib_offl_entry_t::pfx set to

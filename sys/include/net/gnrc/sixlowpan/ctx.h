@@ -103,8 +103,9 @@ gnrc_sixlowpan_ctx_t *gnrc_sixlowpan_ctx_lookup_id(uint8_t id);
  *                          Must be < @ref GNRC_SIXLOWPAN_CTX_SIZE.
  * @param[in] prefix        The prefix for the context.
  * @param[in] prefix_len    Length of @p prefix in bits. Must be > 0.
- * @param[in] ltime         New lifetime of the context. @p comp will be
- *                          implicitly set to `false` if @p ltime == 0.
+ * @param[in] ltime         New lifetime of the context [minutes].
+ *                          @p comp will be implicitly set to `false`
+ *                          if @p ltime == 0.
  * @param[in] comp          Use for compression if true, do not use for
  *                          compression, but still for decompression if false.
  *
@@ -149,7 +150,7 @@ static inline bool gnrc_sixlowpan_ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
  *
  * @param[in] prefix     IPv6 prefix of the compression context
  * @param[in] prefix_len Length of the IPv6 prefix
- * @param[in] valid      Lifetime of the prefix in seconds
+ * @param[in] valid      Lifetime of the prefix in milliseconds
  *
  * @return    true if a new compression context was created or an existing context
  *                 was updated.
@@ -182,7 +183,7 @@ static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uin
     }
     if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
         return gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
-                                         valid / (60 * MS_PER_SEC),
+                                         valid / (SEC_PER_MIN * MS_PER_SEC),
                                          true);
     }
 
