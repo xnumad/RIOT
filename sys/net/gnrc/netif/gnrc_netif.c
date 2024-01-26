@@ -619,6 +619,9 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
     }
     if (idx == UINT_MAX) {
         gnrc_netif_release(netif);
+        LOG_WARNING("gnrc_netif: No space left for address %s on interface %" PRIkernel_pid "\n",
+              ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+              netif->pid);
         return -ENOMEM;
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
