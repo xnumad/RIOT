@@ -728,9 +728,10 @@ void _nib_offl_remove_prefix(_nib_offl_entry_t *pfx)
 
         /* remove address associated with prefix */
         for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
-            if (ipv6_addr_match_prefix(&netif->ipv6.addrs[i],
-                                       &pfx->pfx) >= best_match_len) {
-                best_match_len = pfx->pfx_len;
+            uint8_t match_len;
+            if ((match_len = ipv6_addr_match_prefix(&netif->ipv6.addrs[i],
+                                       &pfx->pfx)) >= best_match_len) {
+                best_match_len = match_len;
                 best_match = &netif->ipv6.addrs[i];
             }
         }
