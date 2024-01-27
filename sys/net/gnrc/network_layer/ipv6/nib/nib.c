@@ -1464,7 +1464,8 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
         _nib_drl_remove(router);
         /* also remove all routes to that router */
         while ((route = _nib_offl_iter(route))) {
-            if ((route->next_hop != NULL) &&
+            if (!(route->flags & _PFX_ON_LINK) &&
+                (route->next_hop != NULL) &&
                 (_nib_onl_get_if(route->next_hop) == iface) &&
                 (ipv6_addr_equal(&route->next_hop->ipv6, &addr))) {
                 route->mode = _EMPTY;
