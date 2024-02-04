@@ -58,6 +58,10 @@ class Installer(abc.ABC):
 
 
 class AskToInstall(Installer):
-    def install(self, package):
+    def _install(self, package):
         print("Please install {name} ({url})".format(**package["generic"]),
               file=sys.stderr)
+        sys.exit(1)
+
+    def install(self, package):
+        self._install(package)
