@@ -47,4 +47,4 @@ class PackageManagerFactory(object):
         if system in ["Arch Linux"]:
             return PacMan("Arch")
         else:
-            return AskToInstall()
+            return AskToInstall("whatever your operating system is")
