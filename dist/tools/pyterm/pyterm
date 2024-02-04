@@ -299,9 +299,11 @@ class SerCmd(cmd.Cmd):
                 else:
                     connected = True
 
-        # wait until connection is established and fire startup
-        # commands to the node
-        time.sleep(1)
+        if not self.process: #no need to wait for process
+            # wait until connection is established
+            time.sleep(1)
+            
+        # fire startup commands to the node
         for command in self.init_cmd:
             self.onecmd(self.precmd(command))
 
