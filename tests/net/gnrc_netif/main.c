@@ -722,10 +722,12 @@ static void test_ipv6_get_iid(void)
             gnrc_netif_ipv6_get_iid(&ethernet_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ethernet_ipv6_ll.u64[1],
                 sizeof(res)));
+
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
             gnrc_netif_ipv6_get_iid(&ieee802154_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_ipv6_ll_long.u64[1],
                 sizeof(res)));
+
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
             gnrc_netapi_set(ieee802154_netif.pid,
                 NETOPT_SRC_LEN, 0,
@@ -734,6 +736,7 @@ static void test_ipv6_get_iid(void)
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
             gnrc_netif_ipv6_get_iid(&ieee802154_netif, &res));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_eui64_short, sizeof(res)));
+
     /* reset to source length 8 */
     ieee802154_l2addr_len = 8U;
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
@@ -741,6 +744,7 @@ static void test_ipv6_get_iid(void)
                 NETOPT_SRC_LEN, 0,
                 &ieee802154_l2addr_len,
                 sizeof(ieee802154_l2addr_len)));
+
     for (unsigned i = 0; i < DEFAULT_DEVS_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netif_ipv6_get_iid(&netifs[i], &res));
     }
@@ -808,11 +812,13 @@ static void test_netapi_get__IPV6_IID(void)
                 0, &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ethernet_ipv6_ll.u64[1],
                 sizeof(value)));
+
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif.pid,
                 NETOPT_IPV6_IID,
                 0, &value, sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_ipv6_ll_long.u64[1],
                 sizeof(value)));
+
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
             gnrc_netapi_set(ieee802154_netif.pid,
                 NETOPT_SRC_LEN, 0,
@@ -824,6 +830,7 @@ static void test_netapi_get__IPV6_IID(void)
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_eui64_short,
                 sizeof(value)));
+
     /* reset to source length 8 */
     ieee802154_l2addr_len = 8U;
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
@@ -831,6 +838,7 @@ static void test_netapi_get__IPV6_IID(void)
                 NETOPT_SRC_LEN, 0,
                 &ieee802154_l2addr_len,
                 sizeof(ieee802154_l2addr_len)));
+
     TEST_ASSERT_EQUAL_INT(-ENOTSUP, gnrc_netapi_get(netifs[0].pid,
                 NETOPT_IPV6_IID,
                 0, &value, sizeof(value)));
