@@ -684,11 +684,16 @@ static void _send(gnrc_pktsnip_t *pkt, bool prep_hdr)
             gnrc_pktbuf_release(pkt);
             return;
         }
-        /* discard to avoid complex checks for correctness (will be re-added
+        /* Unfinished! discard to avoid complex checks for correctness (will be re-added
          * with correct addresses anyway as for the case were there is no
          * netif header provided)
          * Also re-establish temporary pointer used for write protection as
          * actual pointer */
+        /* Even if you’d keep it here, the layers below are not prepared for it,
+           e.g. 6lo aborts if `(pkt->next->type != GNRC_NETTYPE_IPV6)` */
+        // Noticed too late and tried using it. ->
+        // - Maybe refactor callers to not add it in the first place?
+        // - Or if it should be kept for the future, bar it behind a disabled flag for now!
         pkt = gnrc_pktbuf_remove_snip(tmp_pkt, tmp_pkt);
     }
     if (pkt->type != GNRC_NETTYPE_IPV6) {
