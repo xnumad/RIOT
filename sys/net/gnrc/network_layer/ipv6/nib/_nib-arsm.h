@@ -210,7 +210,7 @@ static inline void _deinit_iface_arsm(gnrc_netif_t *netif)
  *
  * @return  Neighbor unreachability state of the @p nbr.
  */
-static inline uint16_t _get_nud_state(_nib_onl_entry_t *nbr)
+static inline uint16_t _get_nud_state(const _nib_onl_entry_t *nbr)
 {
     return (nbr->info & GNRC_IPV6_NIB_NC_INFO_NUD_STATE_MASK);
 }
@@ -236,7 +236,7 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nbr,
  * @return  true, if @p entry is in a reachable state.
  * @return  false, if @p entry is not in a reachable state.
  */
-bool _is_reachable(_nib_onl_entry_t *entry);
+bool _is_reachable(const _nib_onl_entry_t *entry);
 #else   /* CONFIG_GNRC_IPV6_NIB_ARSM || defined(DOXYGEN) */
 #define _handle_snd_ns(ctx)                         (void)ctx
 #define _handle_state_timeout(ctx)                  (void)ctx

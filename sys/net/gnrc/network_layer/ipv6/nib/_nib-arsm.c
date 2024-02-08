@@ -457,7 +457,7 @@ void _set_nud_state(gnrc_netif_t *netif, _nib_onl_entry_t *nce,
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
 }
 
-bool _is_reachable(_nib_onl_entry_t *entry)
+bool _is_reachable(const _nib_onl_entry_t *entry)
 {
     switch (_get_nud_state(entry)) {
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
