@@ -20,6 +20,7 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ndp.h"
 
+#include "_nib-internal.h"
 #include "_nib-6ln.h"
 #include "_nib-6lr.h"
 
@@ -47,18 +48,7 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                ipv6_addr_is_link_local(dst);
 
     if (res) {
-        uint8_t l2addr_len;
-
-        if ((l2addr_len = gnrc_netif_ipv6_iid_to_addr(netif,
-                                                      (eui64_t *)&dst->u64[1],
-                                                      nce->l2addr)) > 0) {
-            DEBUG("nib: resolve address %s%%%u by reverse translating to ",
-                  ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
-                  (unsigned)netif->pid);
-            nce->l2addr_len = l2addr_len;
-            DEBUG("%s\n",
-                  gnrc_netif_addr_to_str(nce->l2addr, nce->l2addr_len,
-                                         addr_str));
+        if (_get_l2addr_from_ipv6(netif, dst, nce) > 0) {
             memcpy(&nce->ipv6, dst, sizeof(nce->ipv6));
             nce->info = 0;
             nce->info |= (netif->pid << GNRC_IPV6_NIB_NC_INFO_IFACE_POS) &

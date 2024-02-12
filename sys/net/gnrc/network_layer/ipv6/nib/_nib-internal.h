@@ -444,6 +444,12 @@ _nib_onl_entry_t *_nib_nc_add(const ipv6_addr_t *addr, unsigned iface,
  */
 void _nib_nc_remove(_nib_onl_entry_t *node);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || !IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) || defined(DOXYGEN)
+int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
+                                        const ipv6_addr_t *ipv6,
+                                        gnrc_ipv6_nib_nc_t *nce);
+#endif
+
 /**
  * @brief   Gets external neighbor cache entry representation from on-link entry
  *
