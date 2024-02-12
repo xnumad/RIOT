@@ -309,6 +309,9 @@ static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
               ipv6_addr_to_str(addr_str, &node->ipv6, sizeof(addr_str)),
               (unsigned)netif->pid);
         nce->l2addr_len = res;
+        DEBUG("%s\n",
+              gnrc_netif_addr_to_str(nce->l2addr, nce->l2addr_len,
+                                     addr_str));
     }
     return res;
 }
