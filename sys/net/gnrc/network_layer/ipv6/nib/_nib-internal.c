@@ -376,6 +376,8 @@ _nib_dr_entry_t *_nib_drl_add(const ipv6_addr_t *router_addr, unsigned iface)
         }
         _override_node(router_addr, iface, def_router->next_hop);
         def_router->next_hop->mode |= _DRL;
+    } else {
+        DEBUG("  DRL full!\n");
     }
     return def_router;
 }
@@ -542,6 +544,8 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         dst->next_hop->mode |= _DST;
         ipv6_addr_init_prefix(&dst->pfx, pfx, pfx_len);
         dst->pfx_len = pfx_len;
+    } else {
+        DEBUG("  NIB full! \n");
     }
     return dst;
 }
