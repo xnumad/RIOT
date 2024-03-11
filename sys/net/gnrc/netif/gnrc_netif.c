@@ -1307,7 +1307,7 @@ int gnrc_netif_ipv6_add_prefix(gnrc_netif_t *netif,
     /* update lifetime */
     if (valid < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
         /* the valid lifetime is given in seconds, but the NIB's timers work
-         * in microseconds, so we have to scale down to the smallest
+         * in milliseconds, so we have to scale down to the smallest
          * possible value (UINT32_MAX - 1). */
         valid = (valid > (UINT32_MAX / MS_PER_SEC))
               ? (UINT32_MAX - 1) : valid * MS_PER_SEC;
