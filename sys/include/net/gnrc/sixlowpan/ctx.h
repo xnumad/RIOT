@@ -183,7 +183,7 @@ static inline bool gnrc_sixlowpan_ctx_update_6ctx(const ipv6_addr_t *prefix, uin
     }
     if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
         return gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
-                                         valid / (60 * MS_PER_SEC),
+                                         valid / (SEC_PER_MIN * MS_PER_SEC),
                                          true);
     }
 
