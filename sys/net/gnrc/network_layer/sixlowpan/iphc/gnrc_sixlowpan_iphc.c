@@ -1222,7 +1222,12 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             }
             gnrc_netif_release(iface);
 
-            if ((ipv6_hdr->src.u64[1].u64 == iid.uint64.u64) ||
+            if (src_ctx != NULL && src_ctx->prefix_len == IPV6_ADDR_BIT_LEN) {
+                /* 0 bits. */
+                iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_CTX_L2;
+                addr_comp = true;
+            }
+            else if ((ipv6_hdr->src.u64[1].u64 == iid.uint64.u64) ||
                 _context_overlaps_iid(src_ctx, &ipv6_hdr->src, &iid)) {
                 /* 0 bits. The address is derived from link-layer address */
                 iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_L2;
