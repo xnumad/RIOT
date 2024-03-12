@@ -24,10 +24,20 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+#include "_nib-router.h"
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
+
+/**
+ * @brief  If source IP address not derived from link-layer address, add compression context.
+ * @return -ENOTSUP if not applicable
+ * @return -1 on failure
+ * @return 0 on success
+ */
+static int _setup_opportunistic_compression_context(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
+                                              const sixlowpan_nd_opt_ar_t *aro);
 
 static uint8_t _update_nce_ar_state(gnrc_netif_t *netif,
                                     const sixlowpan_nd_opt_ar_t *aro,
@@ -140,6 +150,10 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
     uint8_t status = _handle_aro(netif, ipv6, (icmpv6_hdr_t *)nbr_sol, aro,
                                  sl2ao, NULL);
 
+    if (status == SIXLOWPAN_ND_STATUS_SUCCESS) {
+        _setup_opportunistic_compression_context(netif, ipv6, aro);
+    }
+
     if ((status != _ADDR_REG_STATUS_TENTATIVE) &&
         (status != _ADDR_REG_STATUS_IGNORE)) {
         reply_aro = gnrc_sixlowpan_nd_opt_ar_build(status,
@@ -158,6 +172,63 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif,
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
     return reply_aro;
 }
+
+static int _setup_opportunistic_compression_context(gnrc_netif_t *netif,
+                                                    const ipv6_hdr_t *ipv6,
+                                                    const sixlowpan_nd_opt_ar_t *ns_aro) {
+    if (!gnrc_netif_is_6ln(netif) || !gnrc_netif_is_rtr(netif) || !gnrc_netif_is_rtr_adv(netif)) {
+        return -ENOTSUP;
+    }
+#if IS_USED(MODULE_GNRC_IPV6_NIB) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C) && IS_ACTIVE(CONFIG_GNRC_NETIF_IPV6_BR_AUTO_6CTX)
+    ipv6_addr_t eui64_src_addr = IPV6_ADDR_UNSPECIFIED;
+    int res;
+    if ((res = gnrc_netif_ipv6_iid_from_addr(netif, (uint8_t *) &ns_aro->eui64,
+                                             sizeof(ns_aro->eui64),
+                                             (eui64_t *) &eui64_src_addr.u64[1])) < 0) {
+        DEBUG("nib: Failed gnrc_netif_ipv6_iid_from_addr with %d for address %s\n",
+              res, gnrc_netif_addr_to_str((const uint8_t *) &ns_aro->eui64, sizeof(ns_aro->eui64), addr_str));
+        return -1;
+    }
+
+    if (memcmp(&ipv6->src.u64[1], &eui64_src_addr.u64[1], sizeof(network_uint64_t)) == 0) {
+        DEBUG("nib: Address derived from EUI-64, which can already be compressed, no need for compression context. (%s)\n",
+              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+        return -1;
+    }
+
+    if (!gnrc_sixlowpan_ctx_update_6ctx(&ipv6->src, IPV6_ADDR_BIT_LEN,
+                                        MS_PER_SEC * SEC_PER_MIN * byteorder_ntohs(ns_aro->ltime))) {
+        DEBUG("nib: Failed gnrc_sixlowpan_ctx_update_6ctx for %s\n",
+              ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)));
+        return -1;
+    }
+    DEBUG("nib: add compression context for prefix %s/%u\n",
+          ipv6_addr_to_str(addr_str, &ipv6->src, sizeof(addr_str)), IPV6_ADDR_BIT_LEN);
+
+    //update abr contexts bitfield
+    _nib_abr_entry_t *abr = _nib_abr_iter(NULL);
+    res = gnrc_ipv6_nib_abr_add(&abr->addr);
+    /* &ipv6->dst is a link-local addr, whereas ABR addr is a GUA */
+    if (res != 0) {
+        DEBUG("nib: Failed gnrc_ipv6_nib_abr_add: %d\n", res);
+        return -1;
+    }
+
+    /* Do not send the router advertisement with the context applied already.
+     * Done by sending it to the link-local address, which is not subject to the compression context,
+     * whereas &ipv6->src, the address to be registered, is. */
+    ipv6_addr_init_prefix(&eui64_src_addr, &ipv6_addr_link_local_prefix, 10U);
+    /* send RA to disseminate new compression context */
+    _snd_rtr_advs(netif, &eui64_src_addr, false);
+
+    return 0;
+#else
+    (void)ipv6;
+    (void)ns_aro;
+    return -ENOTSUP;
+#endif
+}
+
 #else  /* CONFIG_GNRC_IPV6_NIB_6LR */
 typedef int dont_be_pedantic;
 #endif /* CONFIG_GNRC_IPV6_NIB_6LR */
