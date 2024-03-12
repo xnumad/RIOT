@@ -109,8 +109,7 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
  * @param[in] aro       The original ARO, must not be NULL
  * @param[in] sl2ao     SL2AO associated with the ARO.
  *
- * @return  registration status of the address (including
- *          @ref _ADDR_REG_STATUS_TENTATIVE and @ref _ADDR_REG_STATUS_IGNORE).
+ * @return  the ARO reply to send
  */
 gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                      const ndp_nbr_sol_t *nbr_sol,
