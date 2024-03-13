@@ -96,7 +96,10 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 /* and re-check EUI-64 in case nce was not an NC before */
                 if ((memcmp(&nce->eui64, &aro->eui64,
                             sizeof(aro->eui64)) != 0) &&
-                    (_get_ar_state(nce) != GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC)) {
+                    (_get_ar_state(nce) != GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC) &&
+                    /* If only a tentative NCE from Router Solicitation, EUI64 value is unset because no ARO yet */
+                    nce->eui64.uint64.u64 != 0
+                    ) {
                     /* ignore address registration requests from upstream */
                     DEBUG("nib: Could not register %s, duplicate entry with "
                           "EUI-64 %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
