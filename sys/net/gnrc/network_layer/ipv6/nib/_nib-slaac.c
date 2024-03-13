@@ -75,7 +75,7 @@ void _auto_configure_addr(gnrc_netif_t *netif,
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    bool is_rfc7217 = !(gnrc_netif_is_6ln(netif) && ipv6_addr_is_link_local(pfx));
+    bool is_rfc7217 = true;
     if (is_rfc7217) {
         if (ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
             return;
