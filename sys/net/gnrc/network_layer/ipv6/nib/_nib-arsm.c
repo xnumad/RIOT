@@ -126,15 +126,18 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             if (icmpv6->type == ICMPV6_NBR_SOL) {
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
             else if (_rtr_sol_on_6lr(netif, icmpv6)) {
+                //https://datatracker.ietf.org/doc/html/rfc6775:
+                //"Processing a Router Solicitation":
+                //"a router MAY create a Tentative NCE based on the SLLAO"
                 DEBUG("nib: Setting newly created entry to tentative\n");
                 _set_ar_state(nce, GNRC_IPV6_NIB_NC_INFO_AR_STATE_TENTATIVE);
                 _evtimer_add(nce, GNRC_IPV6_NIB_ADDR_REG_TIMEOUT,
                              &nce->addr_reg_timeout,
                              SIXLOWPAN_ND_TENTATIVE_NCE_SEC_LTIME * MS_PER_SEC);
             }
-#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD && CONFIG_GNRC_IPV6_NIB_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
         }
         else {
             DEBUG("nib: Neighbor cache full\n");
