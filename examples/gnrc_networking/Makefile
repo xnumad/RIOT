@@ -65,6 +65,7 @@ QUIET ?= 1
 
 EXTERNAL_BOARD_DIRS += $(RIOTBASE)/tests/build_system/external_board_dirs/esp-ci-boards
 
+CFLAGS += -DCONFIG_GNRC_IPV6_NIB_ARSM=1
 include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
