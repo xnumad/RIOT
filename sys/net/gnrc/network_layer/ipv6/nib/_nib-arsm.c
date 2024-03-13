@@ -96,6 +96,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     assert(netif != NULL);
     _nib_onl_entry_t *nce = _nib_onl_nc_get(&ipv6->src, netif->pid);
     int l2addr_len;
+    bool is_new_nce = false;
 
     l2addr_len = gnrc_netif_ndp_addr_len_from_l2ao(netif, sl2ao);
     if (l2addr_len < 0) {
@@ -121,6 +122,7 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         nce = _nib_nc_add(&ipv6->src, netif->pid,
                           GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
         if (nce != NULL) {
+            is_new_nce = true;
             if (icmpv6->type == ICMPV6_NBR_SOL) {
                 nce->info &= ~GNRC_IPV6_NIB_NC_INFO_IS_ROUTER;
             }
@@ -155,10 +157,12 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
         /* a 6LR MUST NOT modify an existing NCE based on an SL2AO in an RS
          * see https://tools.ietf.org/html/rfc6775#section-6.3 */
-        if (!_rtr_sol_on_6lr(netif, icmpv6)) {
+        if (is_new_nce) {
             nce->l2addr_len = l2addr_len;
             memcpy(nce->l2addr, sl2ao + 1, l2addr_len);
         }
+#else
+        (void)is_new_nce;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ARSM */
     }
 }
