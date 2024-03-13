@@ -316,17 +316,6 @@ void _nib_nc_get(const _nib_onl_entry_t *node, gnrc_ipv6_nib_nc_t *nce)
     memcpy(&nce->ipv6, &node->ipv6, sizeof(nce->ipv6));
     nce->info = node->info;
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-    if (ipv6_addr_is_link_local(&nce->ipv6)) {
-        gnrc_netif_t *netif = gnrc_netif_get_by_pid(_nib_onl_get_if(node));
-        assert(netif != NULL);
-        (void)netif;    /* flag-checkers might evaluate just to constants */
-        if (gnrc_netif_is_6ln(netif) && !gnrc_netif_is_rtr(netif) &&
-            (_get_l2addr_from_ipv6(netif, node, nce) >= 0)) {
-            return;
-        }
-    }
-#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     nce->l2addr_len = node->l2addr_len;
     memcpy(&nce->l2addr, &node->l2addr, node->l2addr_len);
 #else   /* CONFIG_GNRC_IPV6_NIB_ARSM */
