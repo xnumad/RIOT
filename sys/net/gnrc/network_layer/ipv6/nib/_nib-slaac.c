@@ -75,25 +75,20 @@ void _auto_configure_addr(gnrc_netif_t *netif,
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
-    bool is_rfc7217 = !(gnrc_netif_is_6ln(netif) && ipv6_addr_is_link_local(pfx));
-    if (is_rfc7217) {
-        if (ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
-            return;
-        }
-        flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
-    } else
-#endif
-    {
-        if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
-            DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
-            return;
-        }
-        if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
-            DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
-            return;
-        }
+    if (ipv6_get_rfc7217_iid((eui64_t *) &addr.u64[1], netif, pfx, &dad_ctr) < 0) {
+        return;
     }
-
+    flags |= (dad_ctr << GNRC_NETIF_IPV6_ADDRS_FLAGS_IDGEN_RETRIES_POS);
+#else
+    if (!(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR)) {
+        DEBUG("nib: interface %i has no link-layer addresses\n", netif->pid);
+        return;
+    }
+    if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
+        DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
+        return;
+    }
+#endif
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
         if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
