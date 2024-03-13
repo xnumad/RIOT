@@ -277,7 +277,12 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
         /* consider neighbor cache entries first */
         unsigned iface = (node == NULL) ? 0 : _nib_onl_get_if(node);
 
-        if ((node != NULL) || _on_link(dst, &iface)) {
+        if (((node != NULL) && (node->info & GNRC_IPV6_NIB_NC_INFO_AR_STATE_TENTATIVE))
+            /* "Tentative NCEs MUST NOT be used to
+             * determine on-link status of the registered nodes."
+             * - https://datatracker.ietf.org/doc/html/rfc6775#section-6.5.4
+             */
+            || _on_link(dst, &iface)) {
             DEBUG("nib: %s is %s, start address resolution\n",
                   ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),
                   node ? "in NC" : "on-link");
