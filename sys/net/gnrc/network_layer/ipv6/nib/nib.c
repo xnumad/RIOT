@@ -783,6 +783,15 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if ((dr != NULL) && gnrc_netif_is_6ln(netif) &&
         !gnrc_netif_is_6lbr(netif)) {
         /* (register addresses already assigned but not valid yet)*/
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_STABLE_PRIVACY)
+        /* Register link-local addresses first
+         * https://datatracker.ietf.org/doc/html/rfc8505#section-5.6 */
+        for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
+            if (ipv6_addr_is_link_local(&netif->ipv6.addrs[i])) {
+                _handle_rereg_address(&netif->ipv6.addrs[i]);
+            }
+        }
+#endif
         for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
             if ((netif->ipv6.addrs_flags[i] != 0) &&
                 (netif->ipv6.addrs_flags[i] != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID)) {
