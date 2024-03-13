@@ -584,10 +584,8 @@ static void _handle_rtr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         FOREACH_OPT(rtr_sol, opt, tmp_len) {
             switch (opt->type) {
                 case NDP_OPT_SL2A:
-                    if (!gnrc_netif_is_6ln(netif)) {
-                        _handle_sl2ao(netif, ipv6, (const icmpv6_hdr_t *)rtr_sol,
-                                      opt);
-                    }
+                    _handle_sl2ao(netif, ipv6, (const icmpv6_hdr_t *)rtr_sol,
+                                  opt);
 
                     break;
                 default:
