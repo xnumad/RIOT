@@ -646,7 +646,9 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     size_t tmp_len = icmpv6_len - sizeof(ndp_rtr_adv_t);
     _nib_dr_entry_t *dr = NULL;
     ndp_opt_t *opt;
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool is_new_rtr = false;
+#endif
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     sixlowpan_nd_opt_abr_t *abro = NULL;
@@ -736,11 +738,15 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (!gnrc_netif_is_6lbr(netif) && rtr_adv->ltime.u16 != 0) {
         uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         dr = _nib_drl_get(&ipv6->src, netif->pid);
         if (dr == NULL) {
             is_new_rtr = true;
             dr = _nib_drl_add(&ipv6->src, netif->pid);
         }
+#else
+        dr = _nib_drl_add(&ipv6->src, netif->pid);
+#endif
 
         if (dr != NULL) {
             _evtimer_add(dr, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
