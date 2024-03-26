@@ -302,7 +302,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
 #else   /* MODULE_GNRC_SIXLOWPAN_CTX */
     (void)abr;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
-    return ltime * SEC_PER_MIN * MS_PER_SEC;
+    return (ltime == 0 ? UINT16_MAX : ltime * SEC_PER_MIN * MS_PER_SEC);
 }
 #else  /* CONFIG_GNRC_IPV6_NIB_6LN */
 typedef int dont_be_pedantic;
