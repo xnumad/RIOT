@@ -214,9 +214,12 @@ static int _setup_opportunistic_compression_context(gnrc_netif_t *netif,
         return -1;
     }
 
-    /* Do not send the router advertisement with the context applied already.
+    /* Do not send the router advertisement with the context applied already. */
+    /* TODO Ultimate fix: Send disseminating packet not with compression context applied. E.g. C=0, then in next packet with C=1 */
+    /* Workaround:
      * Done by sending it to the link-local address, which is not subject to the compression context,
-     * whereas &ipv6->src, the address to be registered, is. */
+     * whereas &ipv6->src, the address to be registered, is.
+     * Expects node to have EUI-64 link local. Therefore, does not work if node only has opaque one. */
     ipv6_addr_init_prefix(&eui64_src_addr, &ipv6_addr_link_local_prefix, 10U);
     /* send RA to disseminate new compression context */
     _snd_rtr_advs(netif, &eui64_src_addr, false);
