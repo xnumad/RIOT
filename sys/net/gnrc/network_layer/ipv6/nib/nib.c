@@ -646,6 +646,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     size_t tmp_len = icmpv6_len - sizeof(ndp_rtr_adv_t);
     _nib_dr_entry_t *dr = NULL;
     ndp_opt_t *opt;
+    bool is_new_rtr = false;
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     sixlowpan_nd_opt_abr_t *abro = NULL;
@@ -735,7 +736,12 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     if (!gnrc_netif_is_6lbr(netif) && rtr_adv->ltime.u16 != 0) {
         uint16_t rtr_ltime = byteorder_ntohs(rtr_adv->ltime);
 
-        dr = _nib_drl_add(&ipv6->src, netif->pid);
+        dr = _nib_drl_get(&ipv6->src, netif->pid);
+        if (dr == NULL) {
+            is_new_rtr = true;
+            dr = _nib_drl_add(&ipv6->src, netif->pid);
+        }
+
         if (dr != NULL) {
             _evtimer_add(dr, GNRC_IPV6_NIB_RTR_TIMEOUT, &dr->rtr_timeout,
                          rtr_ltime * MS_PER_SEC);
@@ -777,7 +783,7 @@ static void _handle_rtr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
         netif->ipv6.retrans_time = byteorder_ntohl(rtr_adv->retrans_timer);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
-    if ((dr != NULL) && gnrc_netif_is_6ln(netif) &&
+    if (is_new_rtr && gnrc_netif_is_6ln(netif) &&
         !gnrc_netif_is_6lbr(netif)) {
         /* (register addresses already assigned but not valid yet)*/
         for (int i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
