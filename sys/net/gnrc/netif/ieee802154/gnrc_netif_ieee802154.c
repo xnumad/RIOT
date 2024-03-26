@@ -13,6 +13,7 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <log.h>
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
@@ -309,7 +310,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     if ((res = ieee802154_set_frame_hdr(mhr, src, src_len,
                                         dst, dst_len, dev_pan,
                                         dev_pan, flags, state->seq++)) == 0) {
-        DEBUG("_send_ieee802154: Error preperaring frame\n");
+        LOG_ERROR("_send_ieee802154: Error preparing frame\n");
         gnrc_pktbuf_release(pkt);
         return -EINVAL;
     }
