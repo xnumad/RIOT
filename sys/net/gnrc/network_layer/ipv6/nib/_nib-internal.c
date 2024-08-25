@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <kernel_defines.h>
+#include <log.h>
 
 #include "net/gnrc/icmpv6/error.h"
 #include "net/gnrc/ipv6.h"
@@ -98,6 +99,7 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
     DEBUG("nib: Allocating on-link node entry (addr = %s, iface = %u)\n",
           (addr == NULL) ? "NULL" : ipv6_addr_to_str(addr_str, addr,
                                                      sizeof(addr_str)), iface);
+    //printf("CONFIG_GNRC_IPV6_NIB_NUMOF: %d\n", CONFIG_GNRC_IPV6_NIB_NUMOF);
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {
         _nib_onl_entry_t *tmp = &_nodes[i];
 
@@ -108,7 +110,7 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
             break;
         }
         if ((node == NULL) && (tmp->mode == _EMPTY)) {
-            DEBUG("  using %p\n", (void *)node);
+            DEBUG("  using %p\n", (void *)tmp); //BUGFIX
             node = tmp;
         }
     }
@@ -116,7 +118,7 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
         _override_node(addr, iface, node);
     }
     else {
-        DEBUG("  NIB full\n");
+        //LOG_ERROR("  NIB full\n");
     }
     return node;
 }
@@ -305,7 +307,7 @@ inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
                                           (eui64_t *)&ipv6->u64[1],
                                           nce->l2addr);
     if (res >= 0) {
-        DEBUG("nib: resolve address %s%%%u by reverse translating to ",
+        DEBUG("nib: resolve address %s%%%u by reverse translating\n", //BUGFIX
               ipv6_addr_to_str(addr_str, ipv6, sizeof(addr_str)),
               (unsigned)netif->pid);
         nce->l2addr_len = res;
@@ -545,7 +547,7 @@ _nib_offl_entry_t *_nib_offl_alloc(const ipv6_addr_t *next_hop, unsigned iface,
         ipv6_addr_init_prefix(&dst->pfx, pfx, pfx_len);
         dst->pfx_len = pfx_len;
     } else {
-        DEBUG("  NIB full! \n");
+        LOG_ERROR("  NIB full! \n");
     }
     return dst;
 }
@@ -777,7 +779,7 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
         memcpy(&abr->addr, addr, sizeof(abr->addr));
     }
     else {
-        DEBUG("  NIB full\n");
+        //LOG_ERROR("  NIB full\n");
     }
     return abr;
 }
