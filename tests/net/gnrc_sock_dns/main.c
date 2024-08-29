@@ -48,7 +48,7 @@ static int _dns_server(int argc, char **argv)
     if (((argc > 2) && !inet_pton(AF_INET6, argv[2],
                                   sock_dns_server.addr.ipv6)) ||
         ((argc > 3) && ((sock_dns_server.port = atoi(argv[3])) == 0))) {
-        _usage(argv[1]);
+        _usage(argv[0]);
         return 1;
     }
     else if (argc == 3) {
