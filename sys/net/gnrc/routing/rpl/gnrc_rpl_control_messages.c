@@ -581,7 +581,7 @@ static bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt
             gnrc_netif_t *netif = gnrc_netif_get_by_pid(dodag->iface);
 
             assert(netif != NULL);
-            if ((gnrc_netif_ipv6_get_iid(netif, &iid) < 0)
+            if ((gnrc_netif_ipv6_get_iid(netif, &iid, false) < 0)
                 && !(pi->LAR_flags & GNRC_RPL_PREFIX_AUTO_ADDRESS_BIT)) {
                 break;
             }

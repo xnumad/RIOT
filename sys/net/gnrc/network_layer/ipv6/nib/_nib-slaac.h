@@ -40,8 +40,8 @@ extern "C" {
  * @param[in] pfx       The prefix for the address.
  * @param[in] pfx_len   Length of @p pfx in bits.
  */
-void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                          uint8_t pfx_len);
+void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len,
+                          bool use_short_addr);
 #else   /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 #define _auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;

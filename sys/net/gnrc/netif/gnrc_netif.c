@@ -270,7 +270,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             break;
         case NETOPT_IPV6_IID:
             assert(opt->data_len >= sizeof(eui64_t));
-            res = gnrc_netif_ipv6_get_iid(netif, opt->data);
+            res = gnrc_netif_ipv6_get_iid(netif, opt->data, false);
             break;
         case NETOPT_MAX_PDU_SIZE:
             if (opt->context == GNRC_NETTYPE_IPV6) {
@@ -1615,7 +1615,7 @@ static void _test_options(gnrc_netif_t *netif)
     /* These functions only apply to network devices having link-layers */
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
 #if IS_USED(MODULE_GNRC_NETIF_IPV6)
-        assert(-ENOTSUP != gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&tmp64));
+        assert(-ENOTSUP != gnrc_netif_ipv6_get_iid(netif, (eui64_t *) &tmp64, false));
         assert(-ENOTSUP != gnrc_netif_ndp_addr_len_from_l2ao(netif,
                                                              &dummy_opt));
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */

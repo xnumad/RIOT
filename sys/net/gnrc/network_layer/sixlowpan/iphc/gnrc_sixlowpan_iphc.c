@@ -1215,7 +1215,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             iid.uint64.u64 = 0;
 
             gnrc_netif_acquire(iface);
-            if (gnrc_netif_ipv6_get_iid(iface, &iid) < 0) {
+            if (gnrc_netif_ipv6_get_iid(iface, &iid, false) < 0) {
                 DEBUG("6lo iphc: could not get interface's IID\n");
                 gnrc_netif_release(iface);
                 return 0;

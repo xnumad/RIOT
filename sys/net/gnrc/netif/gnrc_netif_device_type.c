@@ -82,7 +82,7 @@ int gnrc_netif_eui64_from_addr(const gnrc_netif_t *netif,
                 switch (addr_len) {
                     case IEEE802154_SHORT_ADDRESS_LEN: {
                         netdev_t *dev = netif->dev;
-                        return dev->driver->get(dev, NETOPT_ADDRESS_LONG, eui64,
+                        return dev->driver->get(dev, NETOPT_ADDRESS, eui64,
                                                 sizeof(eui64_t));
                     }
                     default:

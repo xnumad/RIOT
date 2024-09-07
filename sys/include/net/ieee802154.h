@@ -597,7 +597,7 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
             break;
 
         case 4:
-            eui64->uint8[0] = addr[i++] ^ 0x02;
+            eui64->uint8[0] = addr[i++] & ~0x02; /* "set to zero" - https://datatracker.ietf.org/doc/html/rfc4944#section-6 */
             eui64->uint8[1] = addr[i++];
 
             /* Falls through. */

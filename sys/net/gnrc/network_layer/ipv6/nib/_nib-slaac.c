@@ -30,8 +30,8 @@
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
-                          uint8_t pfx_len)
+void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx, uint8_t pfx_len,
+                          bool use_short_addr)
 {
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
     int idx;
@@ -56,7 +56,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-    if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]) < 0) {
+    if (gnrc_netif_ipv6_get_iid(netif, (eui64_t *) &addr.u64[1], use_short_addr) < 0) {
         DEBUG("nib: Can't get IID on interface %u\n", netif->pid);
         return;
     }
@@ -128,7 +128,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
     eui64_t orig_iid;
     bool remove_old = false, hwaddr_reconf;
 
-    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid) > 0) {
+    if (gnrc_netif_ipv6_get_iid(netif, &orig_iid, false) > 0) {
         remove_old = true;
     }
     /* seize netif to netif thread since _try_l2addr_reconfiguration uses
@@ -148,7 +148,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
             }
         }
         DEBUG("nib: Changed hardware address, due to DAD\n");
-        _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U);
+        _auto_configure_addr(netif, &ipv6_addr_link_local_prefix, 64U, true);
     }
     return hwaddr_reconf;
 }

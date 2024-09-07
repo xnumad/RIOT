@@ -640,12 +640,41 @@ static inline int gnrc_netif_ipv6_iid_to_addr(const gnrc_netif_t *netif,
  * @return  `-EINVAL`, when gnrc_netif_t::l2addr_len of @p netif is invalid for
  *          the gnrc_netif_t::device_type of @p netif.
  */
-static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid)
+static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid, bool short_addr)
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
+
+        int res;
+        uint8_t *addr;
+        uint8_t inpuut[6];
+        size_t addr_len;
+        if (!short_addr) {
+            addr = netif->l2addr;
+            addr_len = netif->l2addr_len;
+        } else {
+            //addr = ;
+            /* PAN_ID + short addr candidate */
+
+
+            for (int i = 0; i < 6; i++) {
+                inpuut[i] = 0;
+            }
+            /* 6 bytes */
+            //2 bytes = pan_id
+            //2 bytes = empty
+            //2 bytes = short addre
+
+            uint16_t pan_id;
+            res = netif_get_opt(&netif->netif, NETOPT_NID, 0, &pan_id, sizeof(pan_id));
+            assert(res >= 0);
+            inpuut[0] = pan_id; /* does this properly copy the first 2 bytes? */
+
+            addr_len = 4;
+            addr = inpuut;
+        }
         return gnrc_netif_ipv6_iid_from_addr(netif,
-                                             netif->l2addr, netif->l2addr_len,
+                                             addr, addr_len,
                                              iid);
     }
 #endif /* GNRC_NETIF_L2ADDR_MAXLEN > 0 */
