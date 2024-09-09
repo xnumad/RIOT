@@ -672,6 +672,7 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid, boo
             res = 1;
             assert(res >= 0);
             inpuut[0] = pan_id; /* does this properly copy the first 2 bytes? */
+            inpuut[5] = 1;
 
             addr_len = 4;
             addr = inpuut;
