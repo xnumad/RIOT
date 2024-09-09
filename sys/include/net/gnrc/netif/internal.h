@@ -666,7 +666,10 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid, boo
             //2 bytes = short addre
 
             uint16_t pan_id;
-            res = netif_get_opt(&netif->netif, NETOPT_NID, 0, &pan_id, sizeof(pan_id));
+            //res = gnrc_netapi_get(netif->pid, NETOPT_NID, 0, &pan_id, sizeof(pan_id));
+            /* ^ this deadlocks I guess */
+            pan_id = 0x23; //HARDCODED
+            res = 1;
             assert(res >= 0);
             inpuut[0] = pan_id; /* does this properly copy the first 2 bytes? */
 
