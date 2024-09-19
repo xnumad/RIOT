@@ -26,6 +26,8 @@
 
 #include "od.h"
 
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
+
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
 
@@ -303,6 +305,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         else {
             src_len = netif->l2addr_len;
             src = netif->l2addr;
+            printf("addr: %s\n", gnrc_netif_addr_to_str(src, src_len, addr_str));
         }
     }
     /* fill MAC header, seq should be set by device */
