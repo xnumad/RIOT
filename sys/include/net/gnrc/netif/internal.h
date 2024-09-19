@@ -644,36 +644,15 @@ static inline int gnrc_netif_ipv6_get_iid(gnrc_netif_t *netif, eui64_t *iid, boo
 {
 #if GNRC_NETIF_L2ADDR_MAXLEN > 0
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-
-        int res;
         uint8_t *addr;
-        uint8_t inpuut[6];
+        uint8_t inpuut[4];
         size_t addr_len;
         if (!short_addr) {
             addr = netif->l2addr;
             addr_len = netif->l2addr_len;
         } else {
-            //addr = ;
-            /* PAN_ID + short addr candidate */
-
-
-            for (int i = 0; i < 6; i++) {
-                inpuut[i] = 0;
-            }
-            /* 6 bytes */
-            //2 bytes = pan_id
-            //2 bytes = empty
-            //2 bytes = short addre
-
-            uint16_t pan_id;
-            //res = gnrc_netapi_get(netif->pid, NETOPT_NID, 0, &pan_id, sizeof(pan_id));
-            /* ^ this deadlocks I guess */
-            pan_id = 0x23; //HARDCODED
-            res = 1;
-            assert(res >= 0);
-            inpuut[0] = pan_id; /* does this properly copy the first 2 bytes? */
-            inpuut[5] = 1;
-
+            inpuut[2] = 0x12; /* First bit must be 0 (“Range 1” - https://datatracker.ietf.org/doc/html/rfc6775) */
+            inpuut[3] = 0x34;
             addr_len = 4;
             addr = inpuut;
         }
