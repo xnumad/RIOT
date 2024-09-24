@@ -1477,10 +1477,16 @@ static void _handle_pfx_timeout(_nib_offl_entry_t *pfx)
 static void _handle_rtr_timeout(_nib_dr_entry_t *router)
 {
     if ((router->next_hop != NULL) && (router->next_hop->mode & _DRL)) {
+        /* https://datatracker.ietf.org/doc/html/rfc4861#section-6.3.4
+               - If the address is already present in the host's Default Router
+        List and the received Router Lifetime value is zero, immediately
+        time-out the entry as specified in Section 6.3.5. */
+        /* with "entry" meaning DRL */
         _nib_offl_entry_t *route = NULL;
         _nib_onl_entry_t *next_hop = router->next_hop;
 
         _nib_drl_remove(router);
+
         /* The Router Lifetime applies only to
            the router's usefulness as a default router; it
            does not apply to information contained in other
@@ -1488,6 +1494,15 @@ static void _handle_rtr_timeout(_nib_dr_entry_t *router)
            limits for their information include their own
            lifetime fields.
            (https://datatracker.ietf.org/doc/html/rfc4861#section-4.2) */
+        /*
+         * This, rightfully, does not delete the offl entry when it's used, i.e. (route->mode != _EMPTY):
+            https://github.com/RIOT-OS/RIOT/pull/20329#discussion_r1481207844:
+            > Offlink entries are _PL, _DC, _FT.
+            > Assume any flag would be set in route->mode. That means it is present in some data structure.
+            Hence _nib_offl_clear will not clear it.
+            Instead,
+            > An offlink entry must be deleted properly with (_nib_pl_remove, _nib_ft_remove, _nib_dc_remove).
+         */
         while ((route = _nib_offl_iter(route))) {
             if (route->next_hop == next_hop) {
                 _nib_offl_clear(route);
