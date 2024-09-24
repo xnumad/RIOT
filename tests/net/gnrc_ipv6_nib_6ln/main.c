@@ -1092,8 +1092,11 @@ static void test_handle_pkt__rtr_adv__success(uint8_t rtr_adv_flags,
         TEST_ASSERT_MESSAGE(!gnrc_ipv6_nib_pl_iter(0, &state, &prefix),
                             "There is an unexpected prefix list entry");
     }
-    /* neighbor solicitation is only sent when router lifetime is non-zero and
-     * when PIO configures GUA */
+    /* neighbor solicitation is only sent
+     * when router lifetime is non-zero [1]
+     * and when PIO configures GUA.
+     * [1] "When a host has configured a non-link-local IPv6 address, it registers that address with one or more of its _default routers_" - https://datatracker.ietf.org/doc/html/rfc6775#section-3.3
+     */
     if (set_rtr_adv_fields && pio && (pio_flags & NDP_OPT_PI_FLAGS_A)) {
         TEST_ASSERT(msg_avail() > 0);
         while (msg_avail()) {
