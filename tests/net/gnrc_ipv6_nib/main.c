@@ -1294,9 +1294,21 @@ static void test_handle_pkt__rtr_adv__success_pio_0A(void)
                                       NDP_OPT_PI_FLAGS_A);
 }
 
+static void test_handle_pkt__rtr_adv__success_pio_0A_not_default_router(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, false, false, false, true,
+                                      NDP_OPT_PI_FLAGS_A);
+}
+
 static void test_handle_pkt__rtr_adv__success_pio_LA(void)
 {
     test_handle_pkt__rtr_adv__success(0U, true, false, false, true,
+                                      NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
+}
+
+static void test_handle_pkt__rtr_adv__success_pio_LA_not_default_router(void)
+{
+    test_handle_pkt__rtr_adv__success(0U, false, false, false, true,
                                       NDP_OPT_PI_FLAGS_L | NDP_OPT_PI_FLAGS_A);
 }
 
@@ -1491,7 +1503,9 @@ static Test *tests_gnrc_ipv6_nib(void)
         new_TestFixture(test_handle_pkt__rtr_adv__success_pio_00),
         new_TestFixture(test_handle_pkt__rtr_adv__success_pio_L0),
         new_TestFixture(test_handle_pkt__rtr_adv__success_pio_0A),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_0A_not_default_router),
         new_TestFixture(test_handle_pkt__rtr_adv__success_pio_LA),
+        new_TestFixture(test_handle_pkt__rtr_adv__success_pio_LA_not_default_router),
         new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_00),
         new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_L0),
         new_TestFixture(test_handle_pkt__rtr_adv__success_sl2ao_mtuo_pio_0A),
